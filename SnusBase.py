@@ -11,6 +11,8 @@ import click
 from bs4 import BeautifulSoup
 from colorlog import ColoredFormatter
 
+from hashid import check_hash
+
 
 # Setting up a logger
 def setup_logger(verbose=False):
@@ -98,7 +100,7 @@ def get_Hash_data(data):
         Hash1 = Hash[0].split('>')
         Hash2 = Hash1[3].split('<')
         lHash = Hash2[0].rstrip()
-        tHash = 'Sha1'
+        tHash = check_hash(hash_string=lHash)
     except:
         lHash = ''
         tHash = ''

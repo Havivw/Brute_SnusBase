@@ -1,34 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# hashid.py - Software to identify the different types of hashes
-# Copyright (C) 2013-2015 by c0re <c0re@psypanda.org>
-#
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
 import io
 import os
 import re
 import sys
 import argparse
 from collections import namedtuple
-
-__author__  = "c0re"
-__version__ = "3.2.0-dev"
-__github__  = "https://github.com/psypanda/hashID"
-__license__ = "License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>"
-__banner__  = "hashID v{0} by {1} ({2})".format(__version__, __author__, __github__)
 
 Prototype = namedtuple('Prototype', ['regex', 'modes'])
 HashInfo = namedtuple('HashInfo', ['name', 'hashcat', 'john', 'extended'])
@@ -784,7 +762,7 @@ def writeResult(identified_modes, outfile, hashcatMode=False, johnFormat=False, 
 
 
 
-def run(hash_string=None,john=False,Hashcat_mode=False,extended=False):
+def check_hash(hash_string=None,john=False,Hashcat_mode=False,extended=False):
     """
     new function, not in the source
     :return: list of hash matches for the hash_string,["Unknown hash"] if not found
@@ -878,12 +856,3 @@ def main():
             else:
                 outfile.write(u"Analyzing '{0}'\n".format(string.strip()))
                 writeResult(hashID.identifyHash(string), outfile, args.mode, args.john, args.extended)
-
-
-#if __name__ == "__main__":
-#    try:
-#        main()
-#    except KeyboardInterrupt:
-#        pass
-
-print(run(hash_string="afe04867ec7a3845145579a95f72eca7"))
