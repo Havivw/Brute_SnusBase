@@ -49,10 +49,12 @@ FAIL     - SnusBrute -  gf Failed!
 * Need to buy SnusBase User
 
 ## Export Data to CSV FILE
-cat Credentials_File_<domain>.csv
+```
+$ cat Credentials_File_<domain>.csv
 User Name, Domain Name, Hash,  Hash Type, Password, Dump
-aaaa,     domain.com,  aaaaaa, sha1,      12345     Collection1
+username,  domain.com, 8cb2237d0679ca88db6464eac60da96345513964, sha1, 12345, Collection1
+```
 
 ## Contributions..
 
-..are always welcome.
+are always welcome...
