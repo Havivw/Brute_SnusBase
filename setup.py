@@ -7,7 +7,7 @@ setup(
     author_email='Havivv1305@gmail.com',
     license='LICENSE',
     py_modules=['SnusBrute'],
-    description='Get Company users dump from SnusBase',
+    description='Get a linux instance on AWS spot or regular and run commands',
     entry_points={
         'console_scripts': [
                 'snusbrute=SnusBase:SnusBaseBrute',

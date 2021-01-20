@@ -57,4 +57,4 @@ username,  domain.com, 8cb2237d0679ca88db6464eac60da96345513964, sha1, 12345, Co
 
 ## Contributions..
 
-are always welcome...
+..are always welcome.

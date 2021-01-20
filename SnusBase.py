@@ -4,6 +4,7 @@ import time
 import string
 import logging
 import requests
+from os.path import isfile
 from random import shuffle
 from random import randint
 
@@ -174,6 +175,20 @@ def serach(brute_letters, domain, cfduid, a, lg, csrf_token, headers, logger):
                 write_result_file(domain=domain, data=all_data)
         time.sleep(randint(1, 5))
 
+def file_to_list(pathfile):
+    with open(pathfile, "r") as file_content:
+        content_list = [line.strip() for line in file_content.readlines()]
+    return content_list
+
+
+def parse_domain_input(domain):
+    domain_list = []
+    domain = domain.replace(' ', '')
+    if isfile(domain):
+        domain_list = file_to_list(pathfile=domain)
+    else:
+        domain_list.append(domain)
+    return domain_list
 
 ###################################CLICK- CLI########################################
 
@@ -191,7 +206,7 @@ CLICK_CONTEXT_SETTINGS = dict(
               help='SnusBase password.')
 @click.option('-d',
               '--domain',
-              help='Domain name for BruteForce (without). search regex (aa*@*domain*) ')
+              help='Domain name for BruteForce or file with domains list (only domain name like: google). search regex (aa*@*domain*) ')
 @click.option('-v',
               '--verbose',
               is_flag=True,
@@ -202,11 +217,10 @@ def SnusBaseBrute(user, password, domain, verbose):
     """ Run BruteForce on SnusBase using aa*@*domain* """
     logger = setup_logger(verbose=verbose)
     brute_letters = get_brute_latter()
-    cfduid, a, lg, csrf_token, headers = extrct_cookies_csrf(user=user, password=password, logger=logger)
-    serach(brute_letters=brute_letters, domain=domain, cfduid=cfduid, a=a,
-           lg=lg, csrf_token=csrf_token, headers=headers, logger=logger)
-
-
-
+    domain_list = parse_domain_input(domain)
+    for domain_name in domain_list:
+        cfduid, a, lg, csrf_token, headers = extrct_cookies_csrf(user=user, password=password, logger=logger)
+        serach(brute_letters=brute_letters, domain=domain_name, cfduid=cfduid, a=a,
+               lg=lg, csrf_token=csrf_token, headers=headers, logger=logger)
 
 
