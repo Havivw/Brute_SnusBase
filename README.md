@@ -23,8 +23,8 @@ Usage: snusbrute [OPTIONS]
 Options:
   -u, --user TEXT      SnusBase user name.
   -p, --password TEXT  SnusBase password.
-  -d, --domain TEXT    Domain name for BruteForce (without). search regex
-                       (aa*@*domain*)
+  -d, --domain TEXT    Domain name for BruteForce or file with domains list (only domain name like: google). 
+                       search regex (aa*@*domain*).
   -v, --verbose        Display run log in verbose mode.
   -h, --help           Show this message and exit.
 
