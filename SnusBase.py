@@ -78,6 +78,7 @@ def extrct_cookies_csrf(logger, user, password):
     csrf = parsed_html.find("input", attrs={'name': 'csrf_token', 'type': 'hidden'})
     csrf = re.split(r'value="', str(csrf))
     csrf_token = csrf[1].split('"')[0]
+    logger.info("Cookies and CSRF_Token Extracted.")
     return cfduid, a, lg, csrf_token, headers
 
 def get_brute_latter():
@@ -141,25 +142,31 @@ def get_and_aprsed_content(url, headers, cookies, req_data):
     span = parsed_html.find("span", id="result_count")
     return span, parsed_html
 
+
 def serach(brute_letters, domain, cfduid, a, lg, csrf_token, headers, logger):
-    logger.info("Start BruteForce on SnusBase.")
     url = "https://snusbase.com:443/search"
     cookies = {"__cfduid": f"{cfduid}", "a": f"{a}", "lg": f"{lg}"}
     write_result_file(domain=domain)
     for letters in brute_letters:
         remail = f"{letters}%@%{domain}%"
+        logger.debug(f"Search {letters}* with *{domain}* domain.")
         req_data = {"csrf_token": f"{csrf_token}", "term": remail, "wildcard": "on", "searchtype": "email"}
         span, parsed_html = get_and_aprsed_content(url, headers, cookies, req_data)
+        error_10 = 'Please contact support, or try again in 5-10 seconds'
         try:
             Count = int(span.text)
         except:
+            Count = 0
+        while error_10 in str(parsed_html):
+            logger.debug(f"getting error trying again in 10 seconds, Search {letters}* with *{domain}* domain.")
             try:
-                time.sleep(randint(1, 3))
+                time.sleep(10)
                 span, parsed_html = get_and_aprsed_content(url, headers, cookies, req_data)
                 Count = int(span.text)
             except:
                 Count = 0
                 logger.fail(f"{letters} Failed!")
+
         if (Count != 0):
             logger.success(f"{letters} found {Count} results on {domain}.".format(span.text, remail))
             content = parsed_html.find("div", {"id": "contentArea"})
@@ -173,7 +180,7 @@ def serach(brute_letters, domain, cfduid, a, lg, csrf_token, headers, logger):
 
                 all_data = [userName, domainName, lHash, tHash, lPassword, lDump]
                 write_result_file(domain=domain, data=all_data)
-        time.sleep(randint(1, 5))
+        time.sleep(randint(2, 5))
 
 def file_to_list(pathfile):
     with open(pathfile, "r") as file_content:
@@ -181,12 +188,14 @@ def file_to_list(pathfile):
     return content_list
 
 
-def parse_domain_input(domain):
+def parse_domain_input(domain, logger):
     domain_list = []
     domain = domain.replace(' ', '')
     if isfile(domain):
+        logger.info(f"Start BruteForce on SnusBase with domains file list: '{domain}'.")
         domain_list = file_to_list(pathfile=domain)
     else:
+        logger.info(f"Start BruteForce on SnusBase with domain: '{domain}'.")
         domain_list.append(domain)
     return domain_list
 
@@ -206,21 +215,21 @@ CLICK_CONTEXT_SETTINGS = dict(
               help='SnusBase password.')
 @click.option('-d',
               '--domain',
-              help='Domain name for BruteForce or file with domains list (only domain name like: google). search regex (aa*@*domain*) ')
+              help='Domain name for BruteForce or file with domains list (only domain name like: google). search regex (aa*@*domain*).')
 @click.option('-v',
               '--verbose',
               is_flag=True,
               help="Display run log in verbose mode.")
 
+
 def SnusBaseBrute(user, password, domain, verbose):
 
     """ Run BruteForce on SnusBase using aa*@*domain* """
     logger = setup_logger(verbose=verbose)
-    brute_letters = get_brute_latter()
-    domain_list = parse_domain_input(domain)
+    domain_list = parse_domain_input(domain, logger)
+    cfduid, a, lg, csrf_token, headers = extrct_cookies_csrf(user=user, password=password, logger=logger)
     for domain_name in domain_list:
-        cfduid, a, lg, csrf_token, headers = extrct_cookies_csrf(user=user, password=password, logger=logger)
+        brute_letters = get_brute_latter()
         serach(brute_letters=brute_letters, domain=domain_name, cfduid=cfduid, a=a,
                lg=lg, csrf_token=csrf_token, headers=headers, logger=logger)
-
-
+        time.sleep(10)
