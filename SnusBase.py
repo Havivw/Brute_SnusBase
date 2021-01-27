@@ -148,6 +148,8 @@ def serach(brute_letters, domain, cfduid, a, lg, csrf_token, headers, logger):
     cookies = {"__cfduid": f"{cfduid}", "a": f"{a}", "lg": f"{lg}"}
     write_result_file(domain=domain)
     for letters in brute_letters:
+        sleep_seconds = 10
+        failed_count = 0
         remail = f"{letters}%@%{domain}%"
         logger.debug(f"Search {letters}* with *{domain}* domain.")
         req_data = {"csrf_token": f"{csrf_token}", "term": remail, "wildcard": "on", "searchtype": "email"}
@@ -158,14 +160,19 @@ def serach(brute_letters, domain, cfduid, a, lg, csrf_token, headers, logger):
         except:
             Count = 0
         while error_10 in str(parsed_html):
-            logger.debug(f"getting error trying again in 10 seconds, Search {letters}* with *{domain}* domain.")
+            failed_count += 1
+            logger.debug(f"Getting ERROR trying again in {sleep_seconds} seconds, Search {letters}* with *{domain}* domain.")
             try:
-                time.sleep(10)
+                time.sleep(sleep_seconds)
                 span, parsed_html = get_and_aprsed_content(url, headers, cookies, req_data)
                 Count = int(span.text)
             except:
                 Count = 0
-                logger.fail(f"{letters} Failed!")
+                sleep_seconds += 5
+
+            if failed_count == 5:
+                logger.error(f"Getting ERROR!, Please try manual, Search '{letters}%@%{domain}%' on SnusBase site.")
+                break
 
         if (Count != 0):
             logger.success(f"{letters} found {Count} results on {domain}.".format(span.text, remail))
@@ -180,7 +187,8 @@ def serach(brute_letters, domain, cfduid, a, lg, csrf_token, headers, logger):
 
                 all_data = [userName, domainName, lHash, tHash, lPassword, lDump]
                 write_result_file(domain=domain, data=all_data)
-        time.sleep(randint(2, 5))
+        time.sleep(randint(3, 6))
+
 
 def file_to_list(pathfile):
     with open(pathfile, "r") as file_content:
